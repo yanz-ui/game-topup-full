@@ -1,0 +1,11 @@
+game-topup-full/
+    frontend/
+    server-player/
+    server-owner/
+    payments/
+    scripts/
+    architecture/
+    .github/workflows/ci-build-and-push.yml
+    docker-compose.yml
+    package.json
+    ...
