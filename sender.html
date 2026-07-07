@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bug Sender — ASTRAL ENGINE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #060B14;
+      color: #E2EDF9;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0C1424; }
+    ::-webkit-scrollbar-thumb { background: #1B6FBD; border-radius: 4px; }
+
+    /* ============================================================
+       BACKGROUND
+    ============================================================ */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(26, 45, 74, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 45, 74, 0.3) 1px, transparent 1px);
+      background-size: 38px 38px;
+    }
+
+    .bg-glow {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(27, 111, 189, 0.06), transparent 70%);
+      animation: orbitGlow 18s linear infinite;
+    }
+
+    .bg-glow-2 {
+      position: absolute;
+      bottom: 10%;
+      right: 10%;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45, 143, 232, 0.04), transparent 70%);
+      animation: orbitGlow2 22s linear infinite reverse;
+    }
+
+    @keyframes orbitGlow {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-30%) scale(1.2); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    @keyframes orbitGlow2 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-30px, -20px) scale(1.3); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    .bg-vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, #060B14, transparent);
+    }
+
+    /* ============================================================
+       MAIN CONTENT
+    ============================================================ */
+    .main-content {
+      position: relative;
+      z-index: 1;
+      padding: 12px 16px 100px;
+      max-width: 480px;
+      margin: 0 auto;
+      animation: fadeUp 0.8s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       APP BAR
+    ============================================================ */
+    .appbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0 16px;
+      background: linear-gradient(to bottom, #060B14, rgba(6,11,20,0.85));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .appbar-back {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: #0C1424;
+      border: 1px solid #1A2D4A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7A9BBF;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+
+    .appbar-back:hover { background: #1A2D4A; }
+
+    .appbar-title { flex: 1; min-width: 0; }
+    .appbar-title h1 { font-size: 18px; font-weight: 700; color: #E2EDF9; letter-spacing: -0.3px; }
+    .appbar-title p { font-size: 11px; color: #7A9BBF; }
+
+    .appbar-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .appbar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: #0C1424;
+      border: 1px solid #1A2D4A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7A9BBF;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .appbar-btn:hover { background: #1A2D4A; }
+    .appbar-btn.spinning { animation: spin 0.7s linear infinite; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       STAT STRIP
+    ============================================================ */
+    .stat-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #101A2E;
+      border-radius: 14px;
+      border: 1px solid #1A2D4A;
+      margin-bottom: 16px;
+    }
+
+    .stat-strip i { color: #56AEF5; font-size: 16px; }
+    .stat-strip .label { font-size: 13px; font-weight: 600; color: #E2EDF9; }
+    .stat-strip .count { margin-left: auto; }
+    .stat-strip .badge {
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #22C55E;
+    }
+
+    /* ============================================================
+       SENDER CARD
+    ============================================================ */
+    .sender-card {
+      background: #101A2E;
+      border-radius: 20px;
+      border: 1px solid #1A2D4A;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(27, 111, 189, 0.04);
+      animation: cardIn 0.4s ease-out forwards;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .sender-card:nth-child(1) { animation-delay: 0.05s; }
+    .sender-card:nth-child(2) { animation-delay: 0.12s; }
+    .sender-card:nth-child(3) { animation-delay: 0.19s; }
+    .sender-card:nth-child(4) { animation-delay: 0.26s; }
+    .sender-card:nth-child(5) { animation-delay: 0.33s; }
+
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sender-card .accent {
+      height: 2px;
+      background: linear-gradient(to right, transparent, #2D8FE8, transparent);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .sender-card .body {
+      padding: 18px;
+    }
+
+    .sender-card .row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sender-card .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      background: rgba(27, 111, 189, 0.10);
+      border: 1px solid #1E3A5F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #56AEF5;
+      font-size: 22px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .sender-card .avatar .status-dot {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid #101A2E;
+    }
+
+    .sender-card .avatar .status-dot.online {
+      background: #22C55E;
+      animation: dotPulse 1.4s ease-in-out infinite alternate;
+    }
+
+    .sender-card .avatar .status-dot.offline {
+      background: #EF4444;
+    }
+
+    @keyframes dotPulse {
+      0% { opacity: 0.4; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.2); }
+      100% { opacity: 1; box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
+    }
+
+    .sender-card .info { flex: 1; min-width: 0; }
+    .sender-card .info .name { font-size: 15px; font-weight: 700; color: #E2EDF9; }
+    .sender-card .info .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .sender-card .info .status .online { color: #22C55E; }
+    .sender-card .info .status .offline { color: #EF4444; }
+
+    .sender-card .status-badge {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      flex-shrink: 0;
+    }
+
+    .sender-card .status-badge.online {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: #22C55E;
+    }
+
+    .sender-card .status-badge.offline {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #EF4444;
+    }
+
+    .sender-card .divider {
+      height: 1px;
+      background: #1A2D4A;
+      margin: 14px 0;
+    }
+
+    .sender-card .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .sender-card .actions .btn {
+      flex: 1;
+      height: 42px;
+      border-radius: 12px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.13s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .sender-card .actions .btn:active { transform: scale(0.96); }
+
+    .sender-card .actions .btn-refresh {
+      background: rgba(86, 174, 245, 0.06);
+      border: 1px solid rgba(86, 174, 245, 0.2);
+      color: #56AEF5;
+    }
+
+    .sender-card .actions .btn-refresh:hover { background: rgba(86, 174, 245, 0.12); }
+
+    .sender-card .actions .btn-delete {
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #EF4444;
+    }
+
+    .sender-card .actions .btn-delete:hover { background: rgba(239, 68, 68, 0.12); }
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      animation: float 2.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(-6px); }
+      100% { transform: translateY(6px); }
+    }
+
+    .empty-state .icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #101A2E;
+      border: 1px solid #1E3A5F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 38px;
+      color: #56AEF5;
+      box-shadow: 0 0 40px rgba(27, 111, 189, 0.08);
+    }
+
+    .empty-state h2 { font-size: 20px; font-weight: 700; color: #E2EDF9; margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; color: #7A9BBF; line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+    /* ============================================================
+       ERROR STATE
+    ============================================================ */
+    .error-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .error-state .icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 30px;
+      color: #EF4444;
+    }
+
+    .error-state h2 { font-size: 20px; font-weight: 700; color: #E2EDF9; margin-bottom: 6px; }
+    .error-state p { font-size: 13px; color: #7A9BBF; margin-bottom: 20px; }
+
+    /* ============================================================
+       MODAL OVERLAY
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      max-width: 380px;
+      width: 100%;
+      background: #101A2E;
+      border-radius: 24px;
+      padding: 24px;
+      border: 1.5px solid rgba(45, 143, 232, 0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: modalPop 0.35s ease-out;
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-box .modal-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .modal-box .modal-icon.blue {
+      background: rgba(45, 143, 232, 0.08);
+      border: 1px solid rgba(45, 143, 232, 0.2);
+      color: #2D8FE8;
+    }
+
+    .modal-box .modal-icon.red {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #EF4444;
+    }
+
+    .modal-box .modal-icon.green {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: #22C55E;
+    }
+
+    .modal-box h3 { font-size: 17px; font-weight: 700; color: #E2EDF9; margin-bottom: 4px; }
+    .modal-box .sub { font-size: 13px; color: #7A9BBF; margin-bottom: 20px; }
+
+    .modal-box .input-field {
+      width: 100%;
+      padding: 16px 16px 16px 44px;
+      background: #0C1424;
+      border: 1px solid #1A2D4A;
+      border-radius: 14px;
+      color: #E2EDF9;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: 0.2s;
+      position: relative;
+    }
+
+    .modal-box .input-field:focus {
+      border-color: #2D8FE8;
+      box-shadow: 0 0 20px rgba(45, 143, 232, 0.06);
+    }
+
+    .modal-box .input-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .modal-box .input-wrapper .prefix {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7A9BBF;
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .modal-box .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-box .modal-actions .btn {
+      flex: 1;
+      height: 46px;
+      border-radius: 13px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.13s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .modal-box .modal-actions .btn:active { transform: scale(0.96); }
+
+    .modal-box .modal-actions .btn-outline {
+      background: transparent;
+      border: 1px solid #1A2D4A;
+      color: #7A9BBF;
+    }
+
+    .modal-box .modal-actions .btn-outline:hover { background: rgba(26, 45, 74, 0.3); }
+
+    .modal-box .modal-actions .btn-primary {
+      background: linear-gradient(135deg, #2D8FE8, #56AEF5);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(45, 143, 232, 0.25);
+    }
+
+    .modal-box .modal-actions .btn-primary:hover { box-shadow: 0 6px 24px rgba(45, 143, 232, 0.35); }
+
+    .modal-box .modal-actions .btn-danger {
+      background: linear-gradient(135deg, #DC2626, #EF4444);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+    }
+
+    .modal-box .modal-actions .btn-danger:hover { box-shadow: 0 6px 24px rgba(239, 68, 68, 0.35); }
+
+    /* ============================================================
+       PAIRING CODE DIALOG
+    ============================================================ */
+    .pairing-code {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .pairing-code .code-box {
+      padding: 22px 20px;
+      background: #070E1A;
+      border-radius: 16px;
+      border: 1.5px solid rgba(45, 143, 232, 0.4);
+      box-shadow: 0 0 30px rgba(45, 143, 232, 0.08);
+      margin: 16px 0 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 10px;
+      color: #56AEF5;
+      text-align: center;
+      animation: codeGlow 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes codeGlow {
+      0% { border-color: rgba(45, 143, 232, 0.3); box-shadow: 0 0 20px rgba(45, 143, 232, 0.05); }
+      100% { border-color: rgba(45, 143, 232, 0.6); box-shadow: 0 0 40px rgba(45, 143, 232, 0.15); }
+    }
+
+    .pairing-code .copy-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #1A2D4A;
+      background: #0C1424;
+      color: #7A9BBF;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .pairing-code .copy-btn:hover { background: #1A2D4A; }
+    .pairing-code .copy-btn.copied { border-color: #22C55E; color: #22C55E; background: rgba(34, 197, 94, 0.06); }
+
+    .pairing-code .info-box {
+      padding: 12px;
+      background: rgba(27, 111, 189, 0.06);
+      border-radius: 10px;
+      border: 1px solid #1A2D4A;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 12px 0 20px;
+      font-size: 11px;
+      color: #7A9BBF;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .pairing-code .info-box i { color: #7A9BBF; font-size: 14px; margin-top: 2px; flex-shrink: 0; }
+
+    /* ============================================================
+       LOADING DOTS
+    ============================================================ */
+    .dots-loader {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 40px 0;
+    }
+
+    .dots-loader .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(45, 143, 232, 0.3);
+      animation: dotBounce 0.9s ease-in-out infinite;
+    }
+
+    .dots-loader .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dots-loader .dot:nth-child(3) { animation-delay: 0.30s; }
+
+    @keyframes dotBounce {
+      0%, 100% { transform: scale(0.4); opacity: 0.3; }
+      50% { transform: scale(1); opacity: 1; background: #2D8FE8; }
+    }
+
+    /* ============================================================
+       FAB
+    ============================================================ */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2D8FE8, #56AEF5);
+      border: none;
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(45, 143, 232, 0.3);
+      transition: 0.2s;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fabPulse 1.6s ease-in-out infinite alternate;
+    }
+
+    .fab:hover { transform: scale(1.06); box-shadow: 0 12px 40px rgba(45, 143, 232, 0.45); }
+    .fab:active { transform: scale(0.94); }
+
+    @keyframes fabPulse {
+      0% { box-shadow: 0 8px 24px rgba(45, 143, 232, 0.25); }
+      100% { box-shadow: 0 8px 48px rgba(45, 143, 232, 0.5); }
+    }
+
+    /* ============================================================
+       SNACKBAR
+    ============================================================ */
+    .snackbar {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-width: 90%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .snackbar.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .snackbar.success { background: #16A34A; color: #fff; }
+    .snackbar.error { background: #DC2626; color: #fff; }
+
+    .snackbar i { font-size: 16px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 480px) {
+      .main-content { padding: 8px 12px 90px; }
+      .modal-box { padding: 18px; }
+      .sender-card .body { padding: 14px; }
+      .sender-card .avatar { width: 44px; height: 44px; font-size: 18px; }
+      .pairing-code .code-box { font-size: 28px; letter-spacing: 6px; padding: 18px 14px; }
+      .fab { width: 50px; height: 50px; font-size: 22px; bottom: 24px; right: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     BACKGROUND
+============================================================ -->
+<div class="bg-container">
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-glow-2"></div>
+  <div class="bg-vignette"></div>
+</div>
+
+<!-- ============================================================
+     SNACKBAR
+============================================================ -->
+<div class="snackbar" id="snackbar">
+  <i class="fas fa-check-circle"></i>
+  <span id="snackbarMsg">Success</span>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
+<div class="main-content" id="mainContent">
+
+  <!-- APP BAR -->
+  <div class="appbar">
+    <div class="appbar-back" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+    <div class="appbar-title">
+      <h1>Bug Sender</h1>
+      <p id="senderCount">0 sender aktif</p>
+    </div>
+    <div class="appbar-actions">
+      <div class="appbar-btn" id="refreshBtn" onclick="refreshSenders()">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <i class="fas fa-wifi"></i>
+    <span class="label" id="statLabel">0 sender terdaftar</span>
+    <span class="badge">LIVE</span>
+  </div>
+
+  <!-- SENDER LIST -->
+  <div id="senderList"></div>
+
+  <!-- LOADING -->
+  <div class="dots-loader" id="dotsLoader" style="display:none;">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="icon"><i class="fab fa-whatsapp"></i></div>
+    <h2>Belum Ada Sender</h2>
+    <p>Tambah WhatsApp sender pertama untuk mulai mengirim pesan.</p>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="error-state" id="errorState" style="display:none;">
+    <div class="icon"><i class="fas fa-wifi-slash"></i></div>
+    <h2>Koneksi Gagal</h2>
+    <p id="errorMsg">Terjadi kesalahan</p>
+    <button class="modal-box .modal-actions .btn btn-primary" onclick="fetchSenders()" style="padding:12px 32px;border:none;border-radius:13px;background:linear-gradient(135deg,#2D8FE8,#56AEF5);color:#fff;font-weight:600;cursor:pointer;font-size:14px;">
+      <i class="fas fa-sync-alt"></i> Coba Lagi
+    </button>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     FAB
+============================================================ -->
+<button class="fab" id="fabBtn" onclick="openAddSender()">
+  <i class="fas fa-plus"></i>
+</button>
+
+<!-- ============================================================
+     MODAL: ADD SENDER
+============================================================ -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-box">
+    <div class="modal-icon blue"><i class="fas fa-link"></i></div>
+    <h3>Tambah Sender</h3>
+    <p class="sub">Masukkan nomor WhatsApp</p>
+
+    <div class="input-wrapper">
+      <i class="fas fa-phone prefix"></i>
+      <input class="input-field" id="phoneInput" placeholder="628xxx" type="tel" style="padding-left:44px;" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('addModal')">Batal</button>
+      <button class="btn btn-primary" onclick="addSender()">
+        <i class="fas fa-link"></i> Generate Pairing
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: PAIRING CODE
+============================================================ -->
+<div class="modal-overlay" id="pairingModal">
+  <div class="modal-box">
+    <div class="pairing-code">
+      <div class="modal-icon green" style="margin:0 auto 16px;"><i class="fas fa-mobile-alt"></i></div>
+      <h3>Kode Pairing</h3>
+      <p class="sub" id="pairingNumber">Nomor: --</p>
+
+      <div class="code-box" id="pairingCode">------</div>
+
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+        <i class="fas fa-copy"></i> Salin Kode
+      </button>
+
+      <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <span>Buka WhatsApp → Linked Devices → Link a device → Enter code</span>
+      </div>
+
+      <button class="btn btn-primary" onclick="closePairing()" style="width:100%;height:46px;border:none;border-radius:13px;background:linear-gradient(135deg,#2D8FE8,#56AEF5);color:#fff;font-weight:600;cursor:pointer;font-size:14px;">
+        <i class="fas fa-check"></i> Selesai & Refresh
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: DELETE CONFIRM
+============================================================ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-icon red"><i class="fas fa-trash-alt"></i></div>
+    <h3>Hapus Sender?</h3>
+    <p class="sub" id="deleteName">Sender akan dihapus permanen.</p>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Batal</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">
+        <i class="fas fa-trash-alt"></i> Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPT
+============================================================ -->
+<script src="script.js"></script>
+
+<script>
+  // ============================================================
+  // BUG SENDER LOGIC
+  // ============================================================
+  (function() {
+    // ─── DATA ────────────────────────────────────────────────
+    const username = localStorage.getItem('username') || 'Guest';
+    const role = localStorage.getItem('role') || 'member';
+    const sessionKey = localStorage.getItem('key') || '';
+    const expiredDate = localStorage.getItem('expiredDate') || '--';
+
+    let senderList = [];
+    let isLoading = false;
+    let deleteTargetId = null;
+
+    const API_BASE = getApiBase ? getApiBase() : 'https://api.astral.com';
+
+    // ─── DOM REFS ─────────────────────────────────────────────
+    const senderListEl = document.getElementById('senderList');
+    const senderCount = document.getElementById('senderCount');
+    const statLabel = document.getElementById('statLabel');
+    const dotsLoader = document.getElementById('dotsLoader');
+    const emptyState = document.getElementById('emptyState');
+    const errorState = document.getElementById('errorState');
+    const errorMsg = document.getElementById('errorMsg');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    // ─── SNACKBAR ─────────────────────────────────────────────
+    function showSnackbar(msg, type = 'success') {
+      const el = document.getElementById('snackbar');
+      const msgEl = document.getElementById('snackbarMsg');
+      el.className = `snackbar ${type}`;
+      msgEl.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ─── MODAL HELPERS ────────────────────────────────────────
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // ─── FETCH SENDERS ────────────────────────────────────────
+    async function fetchSenders() {
+      if (isLoading) return;
+      isLoading = true;
+      senderListEl.innerHTML = '';
+      dotsLoader.style.display = 'flex';
+      emptyState.style.display = 'none';
+      errorState.style.display = 'none';
+      refreshBtn.classList.add('spinning');
+
+      try {
+        const res = await fetch(`${API_BASE}/mySender?key=${sessionKey}`);
+        const data = await res.json();
+
+        if (data.valid) {
+          senderList = data.connections || [];
+          renderSenders();
+        } else {
+          showError(data.message || 'Gagal mengambil data sender');
+        }
+      } catch (e) {
+        showError('Gagal terhubung ke server');
+      }
+
+      isLoading = false;
+      dotsLoader.style.display = 'none';
+      refreshBtn.classList.remove('spinning');
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorState.style.display = 'block';
+      senderListEl.innerHTML = '';
+    }
+
+    // ─── RENDER SENDERS ───────────────────────────────────────
+    function renderSenders() {
+      if (senderList.length === 0) {
+        emptyState.style.display = 'block';
+        senderListEl.innerHTML = '';
+        senderCount.textContent = '0 sender aktif';
+        statLabel.textContent = '0 sender terdaftar';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      errorState.style.display = 'none';
+
+      const count = senderList.length;
+      senderCount.textContent = `${count} sender aktif`;
+      statLabel.textContent = `${count} sender terdaftar`;
+
+      senderListEl.innerHTML = senderList.map((s, i) => {
+        const name = s.sessionName || 'WhatsApp Sender';
+        const isGlobal = s.isGlobal || false;
+        const scope = isGlobal ? '🌍 Global' : '🔒 Private';
+        const statusClass = 'online';
+        const statusText = 'Connected';
+
+        return `
+          <div class="sender-card">
+            <div class="accent"></div>
+            <div class="body">
+              <div class="row">
+                <div class="avatar">
+                  <i class="fab fa-whatsapp"></i>
+                  <div class="status-dot ${statusClass}"></div>
+                </div>
+                <div class="info">
+                  <div class="name">${escapeHtml(name)}</div>
+                  <div class="status">
+                    <span class="${statusClass}">●</span>
+                    <span class="${statusClass}">${statusText}</span>
+                    <span style="color:#7A9BBF;font-size:11px;margin-left:4px;">${scope}</span>
+                  </div>
+                </div>
+                <div class="status-badge ${statusClass}">${statusClass.toUpperCase()}</div>
+              </div>
+              <div class="divider"></div>
+              <div class="actions">
+                <button class="btn btn-refresh" onclick="refreshSender('${s.id}')">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button class="btn btn-delete" onclick="openDelete('${s.id}', '${escapeHtml(name)}')">
+                  <i class="fas fa-trash-alt"></i> Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ─── REFRESH SENDER ───────────────────────────────────────
+    window.refreshSender = function(id) {
+      showSnackbar('Merefresh sender...', 'success');
+      fetchSenders();
+    };
+
+    window.refreshSenders = function() {
+      fetchSenders();
+    };
+
+    // ─── ADD SENDER ────────────────────────────────────────────
+    window.openAddSender = function() {
+      document.getElementById('phoneInput').value = '';
+      openModal('addModal');
+    };
+
+    window.addSender = async function() {
+      const number = document.getElementById('phoneInput').value.trim();
+      if (!number) {
+        showSnackbar('Masukkan nomor telepon', 'error');
+        return;
+      }
+
+      closeModal('addModal');
+      showSnackbar('Generating pairing code...', 'success');
+
+      try {
+        const res = await fetch(`${API_BASE}/getPairing?key=${sessionKey}&number=${number}`);
+        const data = await res.json();
+
+        if (data.valid) {
+          showPairingCode(number, data.pairingCode);
+        } else {
+          showSnackbar(data.message || 'Gagal generate pairing', 'error');
+        }
+      } catch (e) {
+        showSnackbar('Gagal terhubung ke server', 'error');
+      }
+    };
+
+    // ─── PAIRING CODE ──────────────────────────────────────────
+    let currentPairingCode = '';
+
+    function showPairingCode(number, code) {
+      currentPairingCode = code;
+      document.getElementById('pairingNumber').textContent = `Nomor: ${number}`;
+      document.getElementById('pairingCode').textContent = code;
+      document.getElementById('copyBtn').className = 'copy-btn';
+      document.getElementById('copyBtn').innerHTML = '<i class="fas fa-copy"></i> Salin Kode';
+      openModal('pairingModal');
+    }
+
+    window.copyCode = function() {
+      navigator.clipboard.writeText(currentPairingCode).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.className = 'copy-btn copied';
+        btn.innerHTML = '<i class="fas fa-check"></i> Disalin!';
+        showSnackbar('Kode disalin!', 'success');
+      }).catch(() => {
+        // Fallback
+        const input = document.createElement('input');
+        input.value = currentPairingCode;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showSnackbar('Kode disalin!', 'success');
+      });
+    };
+
+    window.closePairing = function() {
+      closeModal('pairingModal');
+      fetchSenders();
+    };
+
+    // ─── DELETE CONFIRM ────────────────────────────────────────
+    window.openDelete = function(id, name) {
+      deleteTargetId = id;
+      document.getElementById('deleteName').textContent = `Sender '${name}' akan dihapus permanen.`;
+      openModal('deleteModal');
+    };
+
+    window.confirmDelete = async function() {
+      if (!deleteTargetId) return;
+      closeModal('deleteModal');
+      showSnackbar('Menghapus sender...', 'success');
+
+      try {
+        const res = await fetch(`${API_BASE}/deleteSender?key=${sessionKey}&id=${deleteTargetId}`);
+        const data = await res.json();
+
+        if (data.valid) {
+          showSnackbar('Sender berhasil dihapus', 'success');
+          fetchSenders();
+        } else {
+          showSnackbar(data.message || 'Gagal menghapus', 'error');
+        }
+      } catch (e) {
+        showSnackbar('Gagal terhubung ke server', 'error');
+      }
+      deleteTargetId = null;
+    };
+
+    // ─── KEYBOARD SHORTCUT ────────────────────────────────────
+    document.getElementById('phoneInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') window.addSender();
+    });
+
+    // ─── INIT ──────────────────────────────────────────────────
+    fetchSenders();
+
+  })();
+</script>
+
+</body>
+</html>
