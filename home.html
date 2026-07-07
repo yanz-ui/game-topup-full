@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Crash — ASTRAL ENGINE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #000000;
+      color: #FFFFFF;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #050507; }
+    ::-webkit-scrollbar-thumb { background: #FF0040; border-radius: 4px; }
+
+    /* ============================================================
+       BACKGROUND
+    ============================================================ */
+    .bg-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255,0,64,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,0,64,0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .bg-glow {
+      position: absolute;
+      top: 10%;
+      left: -10%;
+      width: 60%;
+      height: 80%;
+      background: radial-gradient(ellipse, rgba(255,0,64,0.05), transparent 70%);
+    }
+
+    .bg-scanline {
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: rgba(255,0,64,0.04);
+      animation: scanMove 6s linear infinite;
+      filter: blur(1px);
+    }
+
+    @keyframes scanMove {
+      0% { top: -5%; }
+      100% { top: 105%; }
+    }
+
+    /* ============================================================
+       MAIN CONTAINER
+    ============================================================ */
+    .main-content {
+      position: relative;
+      z-index: 1;
+      padding: 12px 16px 24px;
+      max-width: 480px;
+      margin: 0 auto;
+      animation: fadeUp 0.6s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       HEADER CARD
+    ============================================================ */
+    .header-card {
+      background: rgba(10,10,13,0.9);
+      border-radius: 24px;
+      border: 1px solid rgba(255,0,64,0.25);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 0 30px rgba(255,0,64,0.06);
+      margin-bottom: 14px;
+    }
+
+    .header-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(255,0,64,0.08);
+      border: 1px solid rgba(255,0,64,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #FF0040;
+      animation: iconPulse 1.8s ease-in-out infinite alternate;
+      flex-shrink: 0;
+    }
+
+    @keyframes iconPulse {
+      0% { box-shadow: 0 0 16px rgba(255,0,64,0.15); border-color: rgba(255,0,64,0.3); }
+      100% { box-shadow: 0 0 32px rgba(255,0,64,0.35); border-color: rgba(255,0,64,0.6); }
+    }
+
+    .header-info { flex: 1; min-width: 0; }
+    .header-info h1 { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; letter-spacing: 1.8px; color: #FF0040; }
+    .header-info p { font-family: 'Share Tech Mono', monospace; font-size: 10.5px; color: #6B6B7A; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .role-pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(255,0,64,0.08);
+      border: 1px solid rgba(255,0,64,0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .role-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: #FF0040; }
+    .role-pill span { font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; color: #FF0040; text-transform: uppercase; }
+
+    /* ============================================================
+       VIDEO CARD
+    ============================================================ */
+    .video-card {
+      height: 190px;
+      border-radius: 22px;
+      background: #0A0A0D;
+      border: 1px solid rgba(255,0,64,0.15);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .video-card video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7));
+    }
+
+    .video-accent {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent, #FF0040, transparent);
+    }
+
+    .video-bottom {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .video-bottom .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #FF0040;
+      animation: pulseDot 1.8s ease-in-out infinite;
+      box-shadow: 0 0 10px rgba(255,0,64,0.5);
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .video-bottom .line {
+      width: 20px;
+      height: 1px;
+      background: rgba(255,0,64,0.5);
+    }
+
+    .video-bottom .label {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #F1F0F5;
+    }
+
+    .video-bottom .play-icon {
+      margin-left: auto;
+      color: rgba(241,240,245,0.4);
+      font-size: 16px;
+    }
+
+    /* ============================================================
+       MODE TOGGLE
+    ============================================================ */
+    .mode-toggle {
+      background: #0A0A0D;
+      border-radius: 16px;
+      border: 1px solid #1C1018;
+      padding: 4px;
+      display: flex;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 13px 0;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: #6B6B7A;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: 0.22s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .mode-btn.active {
+      background: rgba(255,0,64,0.08);
+      color: #FF0040;
+      border: 1.5px solid rgba(255,0,64,0.4);
+      box-shadow: 0 0 16px rgba(255,0,64,0.06);
+      font-weight: 700;
+    }
+
+    .mode-btn i { font-size: 16px; }
+
+    /* ============================================================
+       INPUT SECTION
+    ============================================================ */
+    .input-section {
+      background: #0A0A0D;
+      border-radius: 20px;
+      border: 1px solid rgba(255,0,64,0.10);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .input-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .input-header .bar {
+      width: 2px;
+      height: 14px;
+      border-radius: 2px;
+      background: #FF0040;
+      box-shadow: 0 0 10px rgba(255,0,64,0.4);
+    }
+
+    .input-header span {
+      font-family: 'Orbitron', monospace;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #FF0040;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 16px 18px 16px 48px;
+      background: #0F0F13;
+      border: 1px solid #1C1018;
+      border-radius: 14px;
+      color: #F1F0F5;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .input-wrapper input:focus {
+      border-color: rgba(255,0,64,0.5);
+      box-shadow: 0 0 20px rgba(255,0,64,0.06);
+    }
+
+    .input-wrapper input::placeholder {
+      color: #3D3D4D;
+      font-size: 13px;
+    }
+
+    .input-wrapper .prefix-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,0,64,0.4);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       PAYLOAD SELECTOR
+    ============================================================ */
+    .payload-section {
+      margin-bottom: 14px;
+    }
+
+    .payload-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px 12px;
+    }
+
+    .payload-header .bar {
+      width: 2px;
+      height: 14px;
+      border-radius: 2px;
+      background: #FF0040;
+      box-shadow: 0 0 10px rgba(255,0,64,0.4);
+    }
+
+    .payload-header span {
+      font-family: 'Orbitron', monospace;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #FF0040;
+    }
+
+    .payload-header .counter {
+      margin-left: auto;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #6B6B7A;
+      letter-spacing: 1.5px;
+    }
+
+    .payload-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 0 4px 12px;
+      scrollbar-width: none;
+    }
+
+    .payload-scroll::-webkit-scrollbar { display: none; }
+
+    .payload-card {
+      flex: 0 0 110px;
+      height: 118px;
+      border-radius: 16px;
+      background: #0A0A0D;
+      border: 1px solid #1C1018;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: 0.25s;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .payload-card.selected {
+      flex: 0 0 130px;
+      background: rgba(255,0,64,0.06);
+      border-color: rgba(255,0,64,0.5);
+      box-shadow: 0 0 30px rgba(255,0,64,0.10);
+    }
+
+    .payload-card .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .payload-card .top-row .idx {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: #3D3D4D;
+      letter-spacing: 1px;
+    }
+
+    .payload-card .top-row .sel-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(107,107,122,0.2);
+    }
+
+    .payload-card.selected .top-row .sel-dot {
+      background: #FF0040;
+      animation: dotPulse 0.9s ease-in-out infinite alternate;
+      box-shadow: 0 0 12px rgba(255,0,64,0.4);
+    }
+
+    @keyframes dotPulse {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .payload-card .name-line {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10.5px;
+      color: #6B6B7A;
+      font-weight: 700;
+      margin-top: auto;
+      line-height: 1.3;
+    }
+
+    .payload-card.selected .name-line {
+      color: #F1F0F5;
+      font-size: 11.5px;
+    }
+
+    .payload-card .status-pill {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.8px;
+      margin-top: 6px;
+      border: 1px solid #1C1018;
+      background: #0F0F13;
+      color: #3D3D4D;
+    }
+
+    .payload-card.selected .status-pill {
+      background: rgba(255,0,64,0.12);
+      border-color: rgba(255,0,64,0.35);
+      color: #FF0040;
+    }
+
+    .payload-card .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255,0,64,0.10);
+      animation: cardScan 0.9s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes cardScan {
+      0% { top: 0; opacity: 0; }
+      50% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* ============================================================
+       ARMED STATUS BAR
+    ============================================================ */
+    .armed-bar {
+      background: rgba(255,0,64,0.04);
+      border: 1px solid rgba(255,0,64,0.20);
+      border-radius: 14px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 4px;
+    }
+
+    .armed-bar .icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255,0,64,0.08);
+      border: 1px solid rgba(255,0,64,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FF0040;
+      font-size: 14px;
+    }
+
+    .armed-bar .info { flex: 1; min-width: 0; }
+    .armed-bar .info .name { font-family: 'Share Tech Mono', monospace; font-size: 11.5px; font-weight: 700; color: #F1F0F5; letter-spacing: 0.4px; }
+    .armed-bar .info .id { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: rgba(107,107,122,0.5); letter-spacing: 0.5px; }
+
+    .armed-badge {
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(255,0,64,0.10);
+      border: 1px solid rgba(255,0,64,0.30);
+      font-family: 'Orbitron', monospace;
+      font-size: 8.5px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #FF0040;
+    }
+
+    /* ============================================================
+       SENDER SECTION
+    ============================================================ */
+    .sender-section {
+      background: #0A0A0D;
+      border-radius: 20px;
+      border: 1px solid rgba(255,0,64,0.10);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .sender-section .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .sender-section .header .bar {
+      width: 2px;
+      height: 14px;
+      border-radius: 2px;
+      background: #FF0040;
+      box-shadow: 0 0 10px rgba(255,0,64,0.4);
+    }
+
+    .sender-section .header span {
+      font-family: 'Orbitron', monospace;
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #FF0040;
+    }
+
+    .sender-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .sender-card {
+      padding: 16px 0;
+      border-radius: 14px;
+      background: #0F0F13;
+      border: 1px solid #1C1018;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.22s;
+    }
+
+    .sender-card.selected {
+      background: rgba(255,0,64,0.06);
+      border-color: rgba(255,0,64,0.4);
+      box-shadow: 0 0 16px rgba(255,0,64,0.06);
+    }
+
+    .sender-card .top-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: transparent;
+      margin: 0 auto 8px;
+      transition: 0.22s;
+    }
+
+    .sender-card.selected .top-dot { background: #FF0040; }
+
+    .sender-card .label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #6B6B7A;
+      transition: 0.22s;
+    }
+
+    .sender-card.selected .label { color: #FF0040; }
+
+    .sender-card .count {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #3D3D4D;
+      margin-top: 4px;
+    }
+
+    .sender-card.selected .count { color: rgba(255,0,64,0.5); }
+
+    /* ============================================================
+       LAUNCH BUTTON
+    ============================================================ */
+    .launch-btn {
+      width: 100%;
+      height: 64px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(255,0,64,0.4);
+      background: #0F0F13;
+      color: rgba(255,0,64,0.85);
+      font-family: 'Orbitron', monospace;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      animation: btnPulse 1.8s ease-in-out infinite alternate;
+      margin-bottom: 20px;
+    }
+
+    @keyframes btnPulse {
+      0% { box-shadow: 0 0 20px rgba(255,0,64,0.10); border-color: rgba(255,0,64,0.35); }
+      100% { box-shadow: 0 0 40px rgba(255,0,64,0.20); border-color: rgba(255,0,64,0.55); }
+    }
+
+    .launch-btn:hover:not(:disabled) {
+      transform: scale(1.02);
+      box-shadow: 0 0 50px rgba(255,0,64,0.20);
+    }
+
+    .launch-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      animation: none;
+    }
+
+    .launch-btn .top-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(to bottom, rgba(255,0,64,0.06), transparent);
+      pointer-events: none;
+    }
+
+    .launch-btn .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,0,64,0.2);
+      border-top-color: #FF0040;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .launch-btn.loading .spinner { display: block; }
+    .launch-btn.loading .btn-text { display: none; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 4px 16px;
+    }
+
+    .footer .line {
+      width: 16px;
+      height: 1px;
+      background: rgba(61,61,77,0.3);
+    }
+
+    .footer span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9.5px;
+      color: #3D3D4D;
+      letter-spacing: 1px;
+    }
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      max-width: 360px;
+      width: 100%;
+      background: rgba(10,10,13,0.95);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid rgba(255,0,64,0.25);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(255,0,64,0.10);
+      text-align: center;
+      animation: modalPop 0.35s ease-out;
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: rgba(255,0,64,0.10);
+      border: 1px solid rgba(255,0,64,0.35);
+      color: #FF0040;
+    }
+
+    .modal-box h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #FF0040;
+      margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12.5px;
+      color: #6B6B7A;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,0,64,0.35);
+      background: rgba(255,0,64,0.08);
+      color: #FF0040;
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .modal-btn:hover { background: rgba(255,0,64,0.15); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 480px) {
+      .main-content { padding: 8px 12px 20px; }
+      .header-card { padding: 12px 14px; }
+      .header-icon { width: 44px; height: 44px; font-size: 20px; }
+      .header-info h1 { font-size: 14px; }
+      .video-card { height: 150px; }
+      .payload-card { flex: 0 0 95px; height: 100px; }
+      .payload-card.selected { flex: 0 0 115px; }
+      .launch-btn { height: 56px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     BACKGROUND
+============================================================ -->
+<div class="bg-container">
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-scanline"></div>
+</div>
+
+<!-- ============================================================
+     MODAL
+============================================================ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-icon"><i class="fas fa-info-circle"></i></div>
+    <h3 id="modalTitle">SUCCESS</h3>
+    <p id="modalMessage">Payload berhasil dikirim.</p>
+    <button class="modal-btn" onclick="closeModal()">CLOSE</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
+<div class="main-content">
+
+  <!-- HEADER -->
+  <div class="header-card">
+    <div class="header-icon"><i class="fas fa-bug"></i></div>
+    <div class="header-info">
+      <h1>WHATSAPP CRASH</h1>
+      <p>Advanced Payload Injection Tool</p>
+    </div>
+    <div class="role-pill">
+      <div class="dot"></div>
+      <span id="roleDisplay">MEMBER</span>
+    </div>
+  </div>
+
+  <!-- VIDEO CARD -->
+  <div class="video-card">
+    <video id="bgVideo" muted playsinline loop>
+      <source src="assets/videos/bug.mp4" type="video/mp4" />
+    </video>
+    <div class="video-overlay"></div>
+    <div class="video-accent"></div>
+    <div class="video-bottom">
+      <div class="live-dot"></div>
+      <div class="line"></div>
+      <span class="label">PAYLOAD PREVIEW</span>
+      <i class="fas fa-play-circle play-icon"></i>
+    </div>
+  </div>
+
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="number" onclick="switchMode('number')">
+      <i class="fas fa-phone-alt"></i> BUG NOMOR
+    </button>
+    <button class="mode-btn" data-mode="group" onclick="switchMode('group')">
+      <i class="fas fa-users"></i> BUG GROUP
+    </button>
+  </div>
+
+  <!-- INPUT SECTION -->
+  <div class="input-section">
+    <div class="input-header">
+      <div class="bar"></div>
+      <span id="inputLabel">TARGET NUMBER</span>
+    </div>
+    <div class="input-wrapper">
+      <i class="fas fa-phone-alt prefix-icon" id="inputIcon"></i>
+      <input type="text" id="targetInput" placeholder="+628xxxxxxxxxx" />
+    </div>
+  </div>
+
+  <!-- PAYLOAD SELECTOR -->
+  <div class="payload-section">
+    <div class="payload-header">
+      <div class="bar"></div>
+      <span>SELECT PAYLOAD</span>
+      <span class="counter" id="payloadCounter">01 / 05</span>
+    </div>
+    <div class="payload-scroll" id="payloadScroll">
+      <!-- di-render oleh JS -->
+    </div>
+    <div class="armed-bar" id="armedBar">
+      <div class="icon-box"><i class="fas fa-crosshairs"></i></div>
+      <div class="info">
+        <div class="name" id="armedName">SELECT PAYLOAD</div>
+        <div class="id" id="armedId">ID: --</div>
+      </div>
+      <div class="armed-badge">ARMED</div>
+    </div>
+  </div>
+
+  <!-- SENDER SECTION (hanya untuk role owner/vip) -->
+  <div class="sender-section" id="senderSection" style="display:none;">
+    <div class="header">
+      <div class="bar"></div>
+      <span>SENDER MODE</span>
+    </div>
+    <div class="sender-grid">
+      <div class="sender-card selected" data-mode="private" onclick="switchSender('private')">
+        <div class="top-dot"></div>
+        <div class="label">PRIVATE</div>
+        <div class="count" id="privateCount">0 ACTIVE</div>
+      </div>
+      <div class="sender-card" data-mode="global" onclick="switchSender('global')">
+        <div class="top-dot"></div>
+        <div class="label">GLOBAL</div>
+        <div class="count" id="globalCount">0 ACTIVE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAUNCH BUTTON -->
+  <button class="launch-btn" id="launchBtn" onclick="sendBug()">
+    <div class="top-glow"></div>
+    <span class="spinner"></span>
+    <span class="btn-text"><i class="fas fa-rocket"></i> LAUNCH ATTACK</span>
+  </button>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="line"></div>
+    <span id="sessionDisplay">SESSION: --</span>
+    <div class="line"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPT
+============================================================ -->
+<script src="script.js"></script>
+
+<script>
+  // ============================================================
+  // WHATSAPP CRASH LOGIC
+  // ============================================================
+  (function() {
+    // ─── DATA ────────────────────────────────────────────────
+    const username = localStorage.getItem('username') || 'Guest';
+    const role = localStorage.getItem('role') || 'member';
+    const sessionKey = localStorage.getItem('key') || '';
+    const expiredDate = localStorage.getItem('expiredDate') || '--';
+
+    // ─── BUG LIST (dari API) ────────────────────────────────
+    let bugList = [
+      { bug_id: 'click', bug_name: 'DELAY BY ZSNZ' },
+      { bug_id: 'android', bug_name: 'BLANK BY ZSNZ' },
+      { bug_id: 'invisible', bug_name: 'COMBO HARD BY ZSNZ' },
+      { bug_id: 'ios_invis', bug_name: 'ANDRO DELAY BY ZSNZ' },
+      { bug_id: 'ios_noinvis', bug_name: 'ANDRO LAG BY ZSNZ' },
+    ];
+
+    // ─── STATE ─────────────────────────────────────────────────
+    let bugMode = 'number'; // 'number' | 'group'
+    let selectedBugId = bugList[0]?.bug_id || '';
+    let senderMode = 'private';
+    let isSending = false;
+    let privateCount = 0;
+    let globalCount = 0;
+
+    // ─── DOM REFS ─────────────────────────────────────────────
+    const targetInput = document.getElementById('targetInput');
+    const inputLabel = document.getElementById('inputLabel');
+    const inputIcon = document.getElementById('inputIcon');
+    const payloadScroll = document.getElementById('payloadScroll');
+    const payloadCounter = document.getElementById('payloadCounter');
+    const armedName = document.getElementById('armedName');
+    const armedId = document.getElementById('armedId');
+    const launchBtn = document.getElementById('launchBtn');
+    const roleDisplay = document.getElementById('roleDisplay');
+    const sessionDisplay = document.getElementById('sessionDisplay');
+    const senderSection = document.getElementById('senderSection');
+    const privateCountEl = document.getElementById('privateCount');
+    const globalCountEl = document.getElementById('globalCount');
+
+    // ─── VIDEO ─────────────────────────────────────────────────
+    const video = document.getElementById('bgVideo');
+    video.play().catch(() => {});
+
+    // ─── RENDER FUNCTIONS ──────────────────────────────────────
+    function getFilteredBugs() {
+      if (bugMode === 'group') {
+        return bugList.filter(b => b.bug_id.includes('_group'));
+      }
+      return bugList.filter(b => !b.bug_id.includes('_group'));
+    }
+
+    function renderPayloads() {
+      const bugs = getFilteredBugs();
+      if (bugs.length === 0) {
+        payloadScroll.innerHTML = `<div style="color:#6B6B7A;padding:20px;font-family:'Share Tech Mono',monospace;">No payload available</div>`;
+        payloadCounter.textContent = '00 / 00';
+        return;
+      }
+
+      // Update counter
+      const idx = bugs.findIndex(b => b.bug_id === selectedBugId);
+      const currentIdx = idx >= 0 ? idx : 0;
+      payloadCounter.textContent = 
+        `${(currentIdx + 1).toString().padStart(2, '0')} / ${bugs.length.toString().padStart(2, '0')}`;
+
+      // Set selected bug
+      if (idx < 0) {
+        selectedBugId = bugs[0].bug_id;
+      }
+
+      // Render cards
+      payloadScroll.innerHTML = bugs.map((bug, i) => {
+        const sel = bug.bug_id === selectedBugId;
+        const name = bug.bug_name || 'PAYLOAD';
+        const parts = name.split(' ');
+        const line1 = parts.length > 1 ? parts.slice(0, Math.ceil(parts.length/2)).join(' ') : name;
+        const line2 = parts.length > 1 ? parts.slice(Math.ceil(parts.length/2)).join(' ') : '';
+        
+        return `
+          <div class="payload-card ${sel ? 'selected' : ''}" onclick="selectBug('${bug.bug_id}')">
+            ${sel ? '<div class="scan-line"></div>' : ''}
+            <div class="top-row">
+              <span class="idx">${(i + 1).toString().padStart(2, '0')}</span>
+              <span class="sel-dot"></span>
+            </div>
+            <div class="name-line">${line1}${line2 ? '<br>' + line2 : ''}</div>
+            <span class="status-pill">${sel ? '● ARMED' : '○ STANDBY'}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Update armed bar
+      const selected = bugs.find(b => b.bug_id === selectedBugId);
+      if (selected) {
+        armedName.textContent = selected.bug_name || 'PAYLOAD';
+        armedId.textContent = `ID: ${selected.bug_id}`;
+      }
+    }
+
+    // ─── FUNCTIONS ─────────────────────────────────────────────
+    window.switchMode = function(mode) {
+      bugMode = mode;
+      
+      // Update toggle buttons
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      });
+
+      // Update input label
+      if (mode === 'number') {
+        inputLabel.textContent = 'TARGET NUMBER';
+        inputIcon.className = 'fas fa-phone-alt prefix-icon';
+        targetInput.placeholder = '+628xxxxxxxxxx';
+        targetInput.type = 'tel';
+      } else {
+        inputLabel.textContent = 'GROUP LINK';
+        inputIcon.className = 'fas fa-link prefix-icon';
+        targetInput.placeholder = 'https://chat.whatsapp.com/...';
+        targetInput.type = 'url';
+      }
+
+      targetInput.value = '';
+      renderPayloads();
+    };
+
+    window.selectBug = function(bugId) {
+      selectedBugId = bugId;
+      renderPayloads();
+    };
+
+    window.switchSender = function(mode) {
+      senderMode = mode;
+      document.querySelectorAll('.sender-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.mode === mode);
+      });
+    };
+
+    // ─── VALIDATION ────────────────────────────────────────────
+    function isValidPhone(input) {
+      const cleaned = input.replace(/[\s\-\(\)]/g, '');
+      return /^\+?[1-9]\d{7,14}$/.test(cleaned);
+    }
+
+    function isValidGroup(input) {
+      return input.startsWith('https://chat.whatsapp.com/') && input.length > 26;
+    }
+
+    // ─── SEND BUG ──────────────────────────────────────────────
+    window.sendBug = async function() {
+      if (isSending) return;
+
+      const target = targetInput.value.trim();
+      if (!target) {
+        showModal('ERROR', 'Masukkan target terlebih dahulu.');
+        return;
+      }
+
+      if (bugMode === 'number' && !isValidPhone(target)) {
+        showModal('INVALID TARGET', 'Gunakan format internasional: +62xxx');
+        return;
+      }
+
+      if (bugMode === 'group' && !isValidGroup(target)) {
+        showModal('INVALID LINK', 'Masukkan link grup WA yang valid.');
+        return;
+      }
+
+      const bugs = getFilteredBugs();
+      if (!bugs.some(b => b.bug_id === selectedBugId)) {
+        if (bugs.length > 0) {
+          selectedBugId = bugs[0].bug_id;
+          renderPayloads();
+        } else {
+          showModal('ERROR', 'Tidak ada payload tersedia.');
+          return;
+        }
+      }
+
+      isSending = true;
+      launchBtn.classList.add('loading');
+      launchBtn.disabled = true;
+
+      try {
+        const apiBase = getApiBase ? getApiBase() : API_BASE;
+        const mode = (role === 'owner' || role === 'vip') ? senderMode : 'private';
+        
+        const url = `${apiBase}/sendBug?key=${sessionKey}&target=${target}&bug=${selectedBugId}&senderType=${mode}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.cooldown) {
+          showModal('COOLDOWN', 'Tunggu sebentar sebelum mengirim lagi.');
+        } else if (data.valid === false) {
+          showModal('SESSION EXPIRED', 'Login ulang untuk melanjutkan.');
+        } else if (data.sended === false) {
+          showModal('FAILED', 'Server maintenance atau gagal kirim.');
+        } else {
+          showModal('SUCCESS', 'Payload berhasil dikirim ke target.');
+          targetInput.value = '';
+          fetchSenderStats();
+        }
+      } catch (e) {
+        showModal('CONNECTION ERROR', 'Periksa koneksi dan coba lagi.');
+      }
+
+      isSending = false;
+      launchBtn.classList.remove('loading');
+      launchBtn.disabled = false;
+    };
+
+    // ─── FETCH STATS ───────────────────────────────────────────
+    async function fetchSenderStats() {
+      try {
+        const apiBase = getApiBase ? getApiBase() : API_BASE;
+        const res = await fetch(`${apiBase}/mySender?key=${sessionKey}`);
+        const data = await res.json();
+        if (data.valid) {
+          privateCount = data.privateConnections?.length || 0;
+          globalCount = data.globalConnections?.length || 0;
+          privateCountEl.textContent = `${privateCount} ACTIVE`;
+          globalCountEl.textContent = `${globalCount} ACTIVE`;
+        }
+      } catch (e) {
+        // silent fail
+      }
+    }
+
+    // ─── MODAL ──────────────────────────────────────────────────
+    window.showModal = function(title, message) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMessage').textContent = message;
+      document.getElementById('modalOverlay').classList.add('active');
+    };
+
+    window.closeModal = function() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    };
+
+    // ─── INIT ───────────────────────────────────────────────────
+    function init() {
+      roleDisplay.textContent = role.toUpperCase();
+      sessionDisplay.textContent = `SESSION: ${expiredDate}`;
+
+      // Show sender section for owner/vip
+      if (role === 'owner' || role === 'vip') {
+        senderSection.style.display = 'block';
+      }
+
+      // Load bug list from API
+      const apiBase = getApiBase ? getApiBase() : API_BASE;
+      fetch(`${apiBase}/myInfo?username=${username}&password=dummy&androidId=${localStorage.getItem('androidId') || 'web'}&key=${sessionKey}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.listBug && Array.isArray(data.listBug)) {
+            bugList = data.listBug;
+          }
+          renderPayloads();
+        })
+        .catch(() => {
+          renderPayloads();
+        });
+
+      fetchSenderStats();
+
+      // Enter key to send
+      targetInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendBug();
+      });
+    }
+
+    // Run
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+</script>
+
+</body>
+</html>
