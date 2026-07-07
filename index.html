@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASTRAL ENGINE — Landing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <style>
+    /* ===== RESET & BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0E1117;
+      color: #ECEFF4;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* ===== BACKGROUND GLOW ===== */
+    .landing-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      background: radial-gradient(ellipse at top center, #161B22 0%, #0E1117 50%, #0A0C10 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    .bg-glow {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(29, 233, 182, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 420px;
+      width: 100%;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== LOGO BOX ===== */
+    .logo-box {
+      width: 100%;
+      height: 210px;
+      margin-bottom: 32px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .logo-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(29, 233, 182, 0.2);
+      box-shadow: 0 10px 30px rgba(29, 233, 182, 0.08);
+      background: linear-gradient(135deg, rgba(28, 33, 48, 0.9), rgba(26, 31, 43, 0.8));
+    }
+
+    .logo-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .logo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+      border-radius: 0 0 28px 28px;
+    }
+
+    /* ===== TITLE SECTION ===== */
+    .title-section {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .main-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(to right, #FFFFFF, #1DE9B6, #FFFFFF);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s ease-in-out infinite;
+      line-height: 1.1;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    .title-underline {
+      width: 140px;
+      height: 2px;
+      margin: 12px auto 14px;
+      background: linear-gradient(to right, transparent, #1DE9B6, #00C9A0, transparent);
+      border-radius: 10px;
+    }
+
+    .title-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(29, 233, 182, 0.08);
+      border: 1px solid rgba(29, 233, 182, 0.2);
+      border-radius: 20px;
+      color: #1DE9B6;
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ===== DESC CARD ===== */
+    .desc-card {
+      width: 100%;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(26, 31, 43, 0.7), rgba(26, 31, 43, 0.5));
+      border: 1.5px solid rgba(29, 233, 182, 0.2);
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(29, 233, 182, 0.06);
+    }
+
+    .shield-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(13, 138, 114, 0.6), rgba(29, 233, 182, 0.3));
+      border: 1.5px solid rgba(29, 233, 182, 0.5);
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgba(29, 233, 182, 0.2);
+    }
+
+    .shield-icon i {
+      font-size: 28px;
+      color: #1DE9B6;
+    }
+
+    .desc-card h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(to right, #1DE9B6, #00C9A0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+
+    .desc-card p {
+      color: #ADB5BD;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-login,
+    .btn-support {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      height: 56px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, rgba(29, 233, 182, 0.15), rgba(0, 201, 160, 0.1));
+      border: 1.5px solid #1DE9B6;
+      color: #1DE9B6;
+      margin-bottom: 14px;
+      box-shadow: 0 0 20px rgba(29, 233, 182, 0.15);
+    }
+
+    .btn-login:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 40px rgba(29, 233, 182, 0.25);
+      background: linear-gradient(135deg, rgba(29, 233, 182, 0.25), rgba(0, 201, 160, 0.2));
+    }
+
+    .btn-login i {
+      font-size: 18px;
+    }
+
+    .btn-support {
+      background: rgba(26, 31, 43, 0.5);
+      border: 1.5px solid #2A3040;
+      color: #ADB5BD;
+      margin-bottom: 28px;
+    }
+
+    .btn-support:hover {
+      background: rgba(26, 31, 43, 0.8);
+      border-color: #3A4050;
+      transform: scale(1.01);
+    }
+
+    .btn-support i {
+      font-size: 18px;
+    }
+
+    /* ===== SOCIAL SECTION ===== */
+    .social-section {
+      width: 100%;
+      padding: 24px 20px;
+      background: linear-gradient(135deg, rgba(26, 31, 43, 0.6), rgba(26, 31, 43, 0.4));
+      border: 1px solid #2A3040;
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-label {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(29, 233, 182, 0.08);
+      border: 1px solid rgba(29, 233, 182, 0.15);
+      border-radius: 20px;
+      color: #1DE9B6;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      margin-bottom: 22px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .social-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ADB5BD;
+      transition: all 0.2s ease;
+    }
+
+    .social-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .social-item span {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .social-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      transition: all 0.2s ease;
+    }
+
+    .social-item.telegram .social-circle {
+      background: rgba(41, 182, 246, 0.15);
+      border: 2px solid rgba(41, 182, 246, 0.8);
+      color: #29B6F6;
+      box-shadow: 0 0 20px rgba(41, 182, 246, 0.25);
+    }
+
+    .social-item.tiktok .social-circle {
+      background: rgba(107, 114, 128, 0.15);
+      border: 2px solid rgba(107, 114, 128, 0.8);
+      color: #6B7280;
+      box-shadow: 0 0 20px rgba(107, 114, 128, 0.25);
+    }
+
+    .social-item.instagram .social-circle {
+      background: rgba(225, 48, 108, 0.15);
+      border: 2px solid rgba(225, 48, 108, 0.8);
+      color: #E1306C;
+      box-shadow: 0 0 20px rgba(225, 48, 108, 0.25);
+    }
+
+    .social-item:hover .social-circle {
+      transform: scale(1.08);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .main-title {
+        font-size: 30px;
+      }
+      
+      .logo-box {
+        height: 170px;
+      }
+      
+      .social-circle {
+        width: 54px;
+        height: 54px;
+        font-size: 22px;
+      }
+      
+      .btn-login,
+      .btn-support {
+        font-size: 11px;
+        height: 50px;
+      }
+    }
+
+    /* ===== SERVER STATUS ===== */
+    .server-status {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #6B7280;
+      letter-spacing: 0.5px;
+    }
+
+    .server-status.online {
+      color: #1DE9B6;
+    }
+
+    .server-status.offline {
+      color: #EF4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-wrapper">
+    <!-- Background Glow -->
+    <div class="bg-glow"></div>
+
+    <div class="container">
+      <!-- Logo Box -->
+      <div class="logo-box">
+        <div class="logo-image">
+          <img src="assets/images/login.png" alt="Astral Engine" onerror="this.src='https://files.catbox.moe/5i4s9y.jpg'" />
+          <div class="logo-overlay"></div>
+        </div>
+      </div>
+
+      <!-- Big Title -->
+      <div class="title-section">
+        <h1 class="main-title">ASTRAL ENGINE</h1>
+        <div class="title-underline"></div>
+        <div class="title-badge">G A C O R &nbsp; • &nbsp; T E R U P D A T E &nbsp; • &nbsp; S T A B I L</div>
+      </div>
+
+      <!-- Desc Card -->
+      <div class="desc-card">
+        <div class="shield-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2>ASTRAL BUG</h2>
+        <p>Aplikasi dengan design elegant dan fitur terbaru.<br />Pengembangan langsung oleh TEAM ASTRAL.</p>
+      </div>
+
+      <!-- Login Button -->
+      <a href="login.html" class="btn-login">
+        <i class="fas fa-rocket"></i>
+        LOGIN TO ASTRAL
+      </a>
+
+      <!-- Contact Support -->
+      <a href="https://t.me/maklongemis" target="_blank" class="btn-support">
+        <i class="fas fa-headset"></i>
+        CONTACT SUPPORT
+      </a>
+
+      <!-- Social Section -->
+      <div class="social-section">
+        <div class="social-label">HUBUNGI KAMI</div>
+        <div class="social-icons">
+          <a href="https://t.me/maklongemis" target="_blank" class="social-item telegram">
+            <div class="social-circle">
+              <i class="fab fa-telegram-plane"></i>
+            </div>
+            <span>Telegram</span>
+          </a>
+          <a href="https://tiktok.com/@maklowh" target="_blank" class="social-item tiktok">
+            <div class="social-circle">
+              <i class="fab fa-tiktok"></i>
+            </div>
+            <span>TikTok</span>
+          </a>
+          <a href="https://instagram.com/z4mzzxz" target="_blank" class="social-item instagram">
+            <div class="social-circle">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <span>Instagram</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Server Status -->
+      <div class="server-status" id="serverStatus">🔍 Mengecek server...</div>
+    </div>
+  </div>
+
+  <!-- ===== LOAD SCRIPT.JS ===== -->
+  <script src="script.js"></script>
+</body>
+</html>
