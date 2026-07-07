@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Splash — ASTRAL ENGINE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       SPLASH WRAPPER
+    ============================================================ */
+    .splash-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    /* ============================================================
+       VIDEO BACKGROUND
+    ============================================================ */
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ============================================================
+       OVERLAY GRADIENT
+    ============================================================ */
+    .overlay-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       SKIP BUTTON
+    ============================================================ */
+    .btn-skip {
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-skip:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+
+    .btn-skip i {
+      font-size: 16px;
+    }
+
+    /* ============================================================
+       BOTTOM TEXT
+    ============================================================ */
+    .bottom-text {
+      position: absolute;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 5;
+      padding: 0 20px;
+    }
+
+    .bottom-text h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+      animation: textGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+      100% { text-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 60px rgba(56, 189, 248, 0.4); }
+    }
+
+    .bottom-text p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* ============================================================
+       LOADING SPINNER (if video fails)
+    ============================================================ */
+    .loading-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .loading-spinner .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: #3B82F6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       FADE OUT ANIMATION
+    ============================================================ */
+    .splash-wrapper.fade-out {
+      opacity: 0;
+      transition: opacity 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 480px) {
+      .bottom-text h1 {
+        font-size: 22px;
+      }
+      .btn-skip {
+        top: 40px;
+        right: 16px;
+        padding: 6px 14px;
+        font-size: 12px;
+      }
+      .bottom-text {
+        bottom: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SPLASH SCREEN
+============================================================ -->
+<div class="splash-wrapper" id="splashWrapper">
+  
+  <!-- Video Background -->
+  <div class="video-container" id="videoContainer">
+    <video id="splashVideo" muted playsinline>
+      <source src="assets/videos/splash.mp4" type="video/mp4" />
+    </video>
+    <div class="overlay-gradient"></div>
+  </div>
+
+  <!-- Loading Spinner (hidden by default) -->
+  <div class="loading-spinner" id="loadingSpinner" style="display:none;">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Skip Button -->
+  <button class="btn-skip" id="skipBtn">
+    <i class="fas fa-forward"></i>
+    Skip
+  </button>
+
+  <!-- Bottom Text -->
+  <div class="bottom-text">
+    <h1>ASTRAL ENGINE</h1>
+    <p>Powered by @maklongemis</p>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     SCRIPT
+============================================================ -->
+<script>
+  (function() {
+    const splashWrapper = document.getElementById('splashWrapper');
+    const video = document.getElementById('splashVideo');
+    const skipBtn = document.getElementById('skipBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    let isNavigating = false;
+
+    // ============================================================
+    // NAVIGATE TO DASHBOARD
+    // ============================================================
+    function navigateToDashboard() {
+      if (isNavigating) return;
+      isNavigating = true;
+
+      // Fade out splash
+      splashWrapper.classList.add('fade-out');
+
+      // After fade, redirect to dashboard
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 600);
+    }
+
+    // ============================================================
+    // INIT VIDEO
+    // ============================================================
+    function initVideo() {
+      // Show loading spinner
+      loadingSpinner.style.display = 'block';
+
+      // Try to load video
+      video.load();
+
+      video.addEventListener('loadeddata', function() {
+        // Video loaded, hide spinner
+        loadingSpinner.style.display = 'none';
+        
+        // Play video
+        video.play().catch(function(err) {
+          console.warn('Video autoplay failed:', err);
+          // If autoplay fails, still navigate after 3 seconds
+          setTimeout(navigateToDashboard, 3000);
+        });
+      });
+
+      video.addEventListener('ended', function() {
+        // Video finished, navigate
+        navigateToDashboard();
+      });
+
+      video.addEventListener('error', function() {
+        // Video error, fallback: show spinner then navigate after 3s
+        console.warn('Video error, using fallback');
+        loadingSpinner.style.display = 'none';
+        setTimeout(navigateToDashboard, 3000);
+      });
+
+      // Safety timeout: jika video gak load dalam 5 detik, force navigate
+      setTimeout(function() {
+        if (!isNavigating) {
+          loadingSpinner.style.display = 'none';
+          navigateToDashboard();
+        }
+      }, 5000);
+    }
+
+    // ============================================================
+    // SKIP BUTTON
+    // ============================================================
+    skipBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navigateToDashboard();
+    });
+
+    // ============================================================
+    // TAP/KLIK DI MANA SAJA UNTUK SKIP
+    // ============================================================
+    splashWrapper.addEventListener('click', function(e) {
+      // Jangan trigger kalo klik tombol skip (udah handle di atas)
+      if (e.target.closest('.btn-skip')) return;
+      navigateToDashboard();
+    });
+
+    // ============================================================
+    // START
+    // ============================================================
+    // Cek apakah video file exists, kalo ga ada langsung fallback
+    fetch('assets/videos/splash.mp4', { method: 'HEAD' })
+      .then(function(response) {
+        if (response.ok) {
+          initVideo();
+        } else {
+          // Video not found, langsung navigate after 2s
+          console.warn('Video file not found, using fallback');
+          loadingSpinner.style.display = 'none';
+          setTimeout(navigateToDashboard, 2000);
+        }
+      })
+      .catch(function() {
+        // Network error, fallback
+        console.warn('Network error checking video, using fallback');
+        loadingSpinner.style.display = 'none';
+        setTimeout(navigateToDashboard, 2000);
+      });
+
+  })();
+</script>
+
+</body>
+</html>
